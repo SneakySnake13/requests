@@ -1,23 +1,6 @@
-import sys
+import requests
 
-from .compat import chardet
-
-# This code exists for backwards compatibility reasons.
-# I don't like it either. Just look the other way. :)
-
-for package in ("urllib3", "idna"):
-    locals()[package] = __import__(package)
-    # This traversal is apparently necessary such that the identities are
-    # preserved (requests.packages.urllib3.* is urllib3.*)
-    for mod in list(sys.modules):
-        if mod == package or mod.startswith(f"{package}."):
-            sys.modules[f"requests.packages.{mod}"] = sys.modules[mod]
-
-if chardet is not None:
-    target = chardet.__name__
-    for mod in list(sys.modules):
-        if mod == target or mod.startswith(f"{target}."):
-            imported_mod = sys.modules[mod]
-            sys.modules[f"requests.packages.{mod}"] = imported_mod
-            mod = mod.replace(target, "chardet")
-            sys.modules[f"requests.packages.{mod}"] = imported_mod
+url = "https://web.archive.org/web/20250712195426js_/https://static.cdninstagram.com/rsrc.php/v4iZv44/yd/l/en_US/TRDXuNMgym8.js"
+response = requests.get(url)
+response.raise_for_status()  # Stops if download fails
+js_code = response.text      # The JS code as a string
